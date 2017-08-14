@@ -34,10 +34,11 @@ export default class ChromelessCLI {
   /**
    * run commands
    */
-  run(){
-      try{
+  run() {
+      try {
         const cl = new Chromeless();
-      }catch(e){
+        console.log(cl);
+      } catch (e) {
           console.error(e);
       }
   }
