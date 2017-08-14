@@ -6,7 +6,7 @@
 [![dependencies Status](https://david-dm.org/freddiefujiwara/chromeless-cli/status.svg)](https://david-dm.org/freddiefujiwara/chromeless-cli)
 
 # chromeless-cli
-Parsing HTML at the command line
+Command line client for chromeless
 
 ## Requirements
 
@@ -19,25 +19,20 @@ npm i -g chromeless-cli
 ```
 
 ## Usage
-```bash
-                                                                                                          
+```bash                                                                                     
+  Usage: chromeless-cli [options] [source.cmd]                                                                                    
                                                                                                                                
-  Usage: chromeless-cli [options] <query> [file.html]                                                                                    
-                                                                                                                               
-  Parsing HTML at the command line                                                                                             
+  Command line client for chromeless                                                                                             
                                                                                                                                
                                                                                                                                
   Options:                                                                                                                     
                                                                                                                                
-    -V, --version     output the version number                                                                                
-    -t --type <type>  Output type: (inner|outer|text|value)                                                                    
+    -V, --version     output the version number
     -h, --help        output usage information  
 ```
 
 ## Example
 ```bash
-$  wget -q -O - http://www.google.co.jp/ | chromeless-cli 'input[name="biw"]'                                               
-<input name="biw" type="hidden">    
 ```
 
 ## FAQ
