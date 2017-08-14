@@ -5,6 +5,6 @@ export default class ChromelessCLI {
   /**
    * @constructor
    */
-  constructor(){
+  constructor() {
   }
 }
