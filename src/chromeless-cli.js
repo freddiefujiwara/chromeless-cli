@@ -1,12 +1,33 @@
 import {Chromeless} from 'chromeless';
+import readline from 'readline';
 /**  
 ** main class of ChromelessCLI
 */
 export default class ChromelessCLI {
   /**
    * @constructor
+   * @param {Readable stream} stream stdio or file
    */
-  constructor() {
+  constructor(stream) {
+      this.stream = stream;
+  }
+
+  /**
+   * run commands
+   */
+  async run() {
+      try {
+        const cl = new Chromeless();
+        const iface = readline.createInterface(this.stream, process.stdout);
+        iface.on('line', line => {
+            console.log(this.parseLine(line));
+        });
+        iface.on('close', () => {
+           await cl.end();
+        });
+      } catch (e) {
+          console.error(e);
+      }
   }
 
   /**
@@ -29,17 +50,5 @@ export default class ChromelessCLI {
               }
               return arg;
       });
-  }
-
-  /**
-   * run commands
-   */
-  run() {
-      try {
-        const cl = new Chromeless();
-        console.log(cl);
-      } catch (e) {
-          console.error(e);
-      }
   }
 }
