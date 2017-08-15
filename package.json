@@ -1,6 +1,6 @@
 {
     "name": "chromeless-cli",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Command line client for chromeless",
     "scripts": {
         "clean": "rimraf lib",
@@ -55,6 +55,7 @@
     },
     "dependencies": {
         "chromeless": "^1.2.0",
+        "commander": "^2.11.0",
         "semver": "^5.4.1"
     },
     "engines": {

@@ -1,0 +1,6 @@
+goto http://www.rakuten.co.jp
+wait 'a[sc_linkname="seasonal317"]'
+focus 'a[sc_linkname="seasonal317"]'
+click 'a[sc_linkname="seasonal317"]'
+wait 1000
+screenshot
