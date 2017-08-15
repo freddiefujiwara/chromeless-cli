@@ -6,7 +6,7 @@ import readline from 'readline';
 export default class ChromelessCLI {
 /**
 * @constructor
-* @param {Readable stream} stream stdio or file
+* @param {stream} stream stdio or file
 */
     constructor(stream) {
         this.stream = stream;
@@ -18,10 +18,10 @@ export default class ChromelessCLI {
     async run() {
         const cl = new Chromeless();
         const iface = readline.createInterface(this.stream, process.stdout);
-        iface.on('line', async line => {
+        iface.on('line', async (line) => {
             const args = this.parseLine(line);
-            const result = await cl[args.shift()].apply(cl,args)
-            if(typeof result === 'undefined'){
+            const result = await cl[args.shift()](...args);
+            if (typeof result === 'undefined') {
                 return;
             }
             console.log(result);
