@@ -23,4 +23,4 @@ if((typeof fileValue) === 'string'){
 
 let ChromelessCLI = require('./lib/chromeless-cli');
 let ccli = new ChromelessCLI(stream);
-ccli.run().catch(console.error.bind(console));
+ccli.run();

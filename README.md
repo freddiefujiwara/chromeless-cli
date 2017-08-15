@@ -33,6 +33,11 @@ npm i -g chromeless-cli
 
 ## Example
 ```bash
+goto http://www.google.com
+type chromeless-cli 'input[name="q"]'
+click 'input[type="submit"]'
+wait #resultStats
+screenshot
 ```
 
 ## FAQ
