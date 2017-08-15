@@ -15,19 +15,23 @@ export default class ChromelessCLI {
     /**
     * run commands
     */
-    async run() {
+    run() {
         const cl = new Chromeless();
         const iface = readline.createInterface(this.stream, process.stdout);
-        iface.on('line', async (line) => {
+        iface.on('line', (line) => {
             const args = this.parseLine(line);
-            const result = await cl[args.shift()](...args);
-            if (typeof result === 'undefined') {
-                return;
-            }
-            console.log(result);
+            cl[args.shift()](...args).then((result) =>{
+                if (typeof result === 'undefined') {
+                    return;
+                }
+                console.log(result);
+            }).catch((e) => {
+                console.error(e);
+                iface.close();
+            });
         });
-        iface.on('close', async () => {
-            await cl.end();
+        iface.on('close', () => {
+            cl.end().then().catch(console.error.bind(console));
         });
     }
 

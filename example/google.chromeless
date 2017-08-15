@@ -1,3 +1,5 @@
 goto http://www.google.com
+type chromeless-cli 'input[name="q"]'
+click 'input[type="submit"]'
+wait #resultStats
 screenshot
-end
