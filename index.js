@@ -16,7 +16,7 @@ program
 program.parse(process.argv);
 
 if((typeof fileValue) === 'string'){
-    fd = fs.openSync(fileValue,'r+');
+    fd = fs.openSync(fileValue,'r');
 }else{
     fd = process.stdin.fd;
 }

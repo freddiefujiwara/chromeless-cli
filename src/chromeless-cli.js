@@ -1,13 +1,12 @@
 import {Chromeless} from 'chromeless';
 import fs from 'fs';
-import os from 'os';
 /**  
  ** main class of ChromelessCLI
  */
 export default class ChromelessCLI {
     /**
-    * @constructor
-    * @param {fd} fd stdin or file
+     * @constructor
+     * @param {fd} fd stdin or file
     */
     constructor(fd) {
         this.fd = fd;
@@ -19,16 +18,30 @@ export default class ChromelessCLI {
     * @return {string} one line string
     */
     readLine() {
-        let length = fs.fstatSync(this.fd).size;
-        let buffer = new Buffer(length);
-        let bytesRead = fs.readSync(this.fd, buffer, 0, length, 0);
-        for (let i = 0; i < bytesRead; i++) {
-            // EOL '\n'
-            if ( 0x0a === buffer[i] ) {
-                return buffer.toString('utf8', 0,
-                                       os.EOL.length > 1 ? i - 1 : i);
+        let buffer = new Buffer(1);
+        let line = '';
+        while (true) { // Loop as long as stdin input is available.
+            let bytesRead = 0;
+            try {
+                bytesRead = fs.readSync(this.fd, buffer, 0, 1);
+                if (0 === bytesRead) {
+                    break;
+                }
+                line += buffer.toString('utf8', 0, 1);
+                if ( 0x0a === buffer[0] ) { // EOL 'n'
+                    break;
+                }
+            } catch (e) {
+                // reached to EOF
+                if ('EOF' === e.code) {
+                    break;
+                }
+                // ignore other exceptions ...
+                // but it's not a good idea
+                // welcome to other solutions
             }
         }
+        return line;
     }
 
     /**
@@ -38,14 +51,21 @@ export default class ChromelessCLI {
         if ( typeof this.cl === 'undefined') {
             this.cl = new Chromeless();
         }
-        const args = this.parseLine(this.readLine());
+        const line = this.readLine();
+        if ( '' === line ) {
+            this.cl.end().then(() => {
+                fs.closeSync(this.fd);
+            }).catch(console.error.bind(console));
+            return;
+        }
+        const args = this.parseLine(line);
         this.cl[args.shift()](...args).then((result) =>{
             if (typeof result === 'string') {
                 console.log(result);
             }
-            this.run();
+            this.run(); // loop
         }).catch((e) => {
-            this.cl.end().then().catch(console.error.bind(console));
+            console.error(e);
         });
     }
 
