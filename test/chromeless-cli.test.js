@@ -4,12 +4,13 @@ import ChromelessCLI from '../src/chromeless-cli';
 
 describe('ChromelessCLI test.', (suite) => {
   it('should have properties ', () => {
-    const ccli = new ChromelessCLI({});
+    const ccli = new ChromelessCLI(process.stdin);
     ccli.should.be.a('object');
-    ccli.should.have.property('stream').with.a('object');
+    ccli.should.have.property('fd').with.a('object');
+    ccli.should.have.property('cl').with.equal(undefined);
   });
   it('parse a line ', () => {
-    const ccli = new ChromelessCLI({});
+    const ccli = new ChromelessCLI(process.stdin);
     ccli.should.have.property('parseLine').with.a('function');
     ccli.parseLine({})
         .should.deep.equal([]);
@@ -27,7 +28,11 @@ describe('ChromelessCLI test.', (suite) => {
         .should.deep.equal(['func', {'key': []}, 'arg2']);
   });
   it('run ', () => {
-    const ccli = new ChromelessCLI({});
+    const ccli = new ChromelessCLI(process.stdin);
     ccli.should.have.property('run').with.a('function');
+  });
+  it('readLine ', () => {
+    const ccli = new ChromelessCLI(process.stdin);
+    ccli.should.have.property('readLine').with.a('function');
   });
 });

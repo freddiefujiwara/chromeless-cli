@@ -1,37 +1,51 @@
 import {Chromeless} from 'chromeless';
-import readline from 'readline';
+import fs from 'fs';
+import os from 'os';
 /**  
  ** main class of ChromelessCLI
  */
 export default class ChromelessCLI {
-/**
-* @constructor
-* @param {stream} stream stdio or file
-*/
-    constructor(stream) {
-        this.stream = stream;
+    /**
+    * @constructor
+    * @param {fd} fd stdin or file
+    */
+    constructor(fd) {
+        this.fd = fd;
+        this.cl = undefined;
+    }
+    /**
+    * Get a line from fd
+    *
+    * @return {string} one line string
+    */
+    readLine() {
+        let length = fs.fstatSync(this.fd).size;
+        let buffer = new Buffer(length);
+        let bytesRead = fs.readSync(this.fd, buffer, 0, length, 0);
+        for (let i = 0; i < bytesRead; i++) {
+            // EOL '\n'
+            if ( 0x0a === buffer[i] ) {
+                return buffer.toString('utf8', 0,
+                                       os.EOL.length > 1 ? i - 1 : i);
+            }
+        }
     }
 
     /**
     * run commands
     */
     run() {
-        const cl = new Chromeless();
-        const iface = readline.createInterface(this.stream, process.stdout);
-        iface.on('line', (line) => {
-            const args = this.parseLine(line);
-            cl[args.shift()](...args).then((result) =>{
-                if (typeof result === 'undefined') {
-                    return;
-                }
+        if ( typeof this.cl === 'undefined') {
+            this.cl = new Chromeless();
+        }
+        const args = this.parseLine(this.readLine());
+        this.cl[args.shift()](...args).then((result) =>{
+            if (typeof result === 'string') {
                 console.log(result);
-            }).catch((e) => {
-                console.error(e);
-                iface.close();
-            });
-        });
-        iface.on('close', () => {
-            cl.end().then().catch(console.error.bind(console));
+            }
+            this.run();
+        }).catch((e) => {
+            this.cl.end().then().catch(console.error.bind(console));
         });
     }
 
