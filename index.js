@@ -3,7 +3,7 @@
 let fs = require('fs');
 let program = require('commander');
 let pkg = require('./package');
-let stream = undefined;
+let fd = undefined;
 let fileValue = undefined;
 
 program
@@ -16,11 +16,11 @@ program
 program.parse(process.argv);
 
 if((typeof fileValue) === 'string'){
-    stream = fs.createReadStream(fileValue);
+    fd = fs.openSync(fileValue,'r');
 }else{
-    stream = process.stdin;
+    fd = process.stdin.fd;
 }
 
 let ChromelessCLI = require('./lib/chromeless-cli');
-let ccli = new ChromelessCLI(stream);
+let ccli = new ChromelessCLI(fd);
 ccli.run();
