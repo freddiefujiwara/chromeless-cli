@@ -5,12 +5,13 @@ import fs from 'fs';
  */
 export default class ChromelessCLI {
     /**
-     * @constructor
-     * @param {fd} fd stdin or file
+    * @constructor
+    * @param {fd} fd stdin or file
     */
     constructor(fd) {
         this.fd = fd;
         this.cl = undefined;
+        this.stdin = '';
     }
     /**
     * Get a line from fd
@@ -18,32 +19,42 @@ export default class ChromelessCLI {
     * @return {string} one line string
     */
     readLine() {
-        let buffer = new Buffer(1);
-        let line = '';
-        while (true) { // Loop as long as stdin input is available.
-            let bytesRead = 0;
-            try {
-                bytesRead = fs.readSync(this.fd, buffer, 0, 1);
-                if (0 === bytesRead) {
-                    break;
+        if (this.stdin.length === 0) {
+            const BUFSIZE = 256;
+            let totalBuf = Buffer.alloc(BUFSIZE, '', 'utf8');
+            for (;;) {
+                try {
+                    let buf = Buffer.alloc(BUFSIZE, '', 'utf8');
+                    let bytesRead = fs.readSync(this.fd, buf, 0, BUFSIZE, null);
+                    if (bytesRead === 0) {
+                        break;
+                    }
+                    // Copy the new bytes to totalBuf.
+                    let totalBytesRead = 0;
+                    let tmpBuf = Buffer
+                        .alloc(totalBytesRead + bytesRead, '', 'utf8');
+                    totalBuf.copy(tmpBuf, 0, 0, totalBytesRead);
+                    buf.copy(tmpBuf, totalBytesRead, 0, bytesRead);
+                    totalBuf = tmpBuf;
+                    totalBytesRead += bytesRead;
+
+                    if (buf.includes('\n')) {
+                        break;
+                    }
+                } catch (e) {
+                    if (e.code === 'EOF') {
+                         break;
+                    }
                 }
-                line += buffer.toString('utf8', 0, 1);
-                if ( 0x0a === buffer[0] ) { // EOL 'n'
-                    break;
-                }
-            } catch (e) {
-                // reached to EOF
-                if ('EOF' === e.code) {
-                    break;
-                }
-                // ignore other exceptions ...
-                // but it's not a good idea
-                // welcome to other solutions
             }
+            this.stdin = totalBuf.toString('utf8');
         }
+        let newline = this.stdin.search('\n') + 1;
+        let line = this.stdin.slice(0, newline);
+        // Flush
+        this.stdin = this.stdin.slice(newline);
         return line;
     }
-
     /**
     * run commands
     */
@@ -59,7 +70,8 @@ export default class ChromelessCLI {
             return;
         }
         const args = this.parseLine(line);
-        this.cl[args.shift()](...args).then((result) =>{
+        this.cl[args.shift()](...args)
+            .then((result) =>{
             if (typeof result === 'string') {
                 console.log(result);
             }
