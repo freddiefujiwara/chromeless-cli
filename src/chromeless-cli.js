@@ -22,7 +22,7 @@ export default class ChromelessCLI {
         const BUFSIZE = 256;
         let totalBytesRead = this.stdin.length;
         let totalBuf = Buffer.alloc(BUFSIZE + totalBytesRead, '', 'utf8');
-        Buffer.from(this.stdin,'utf8').copy(totalBuf,0,0,totalBytesRead);
+        Buffer.from(this.stdin, 'utf8').copy(totalBuf, 0, 0, totalBytesRead);
         for (;;) {
             try {
                 let buf = Buffer.alloc(BUFSIZE, '', 'utf8');
