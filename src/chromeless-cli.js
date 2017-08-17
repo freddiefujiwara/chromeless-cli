@@ -22,6 +22,7 @@ export default class ChromelessCLI {
         if (this.stdin.length === 0) {
             const BUFSIZE = 256;
             let totalBuf = Buffer.alloc(BUFSIZE, '', 'utf8');
+            let totalBytesRead = 0;
             for (;;) {
                 try {
                     let buf = Buffer.alloc(BUFSIZE, '', 'utf8');
@@ -30,14 +31,12 @@ export default class ChromelessCLI {
                         break;
                     }
                     // Copy the new bytes to totalBuf.
-                    let totalBytesRead = 0;
                     let tmpBuf = Buffer
                         .alloc(totalBytesRead + bytesRead, '', 'utf8');
                     totalBuf.copy(tmpBuf, 0, 0, totalBytesRead);
                     buf.copy(tmpBuf, totalBytesRead, 0, bytesRead);
                     totalBuf = tmpBuf;
                     totalBytesRead += bytesRead;
-
                     if (buf.includes('\n')) {
                         break;
                     }
